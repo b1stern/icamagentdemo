@@ -74,7 +74,7 @@
     when: (src_type|lower) == "curl"
 
   - name: Running "sudo yum install wget" 
-    shell: "sudo yum install wget"
+    shell: "sudo yum -y install wget"
     when: (src_type|lower) == "wget"
     
   - name: Running the script "{{ dest_image }}/{{imagefile}}" "{{args_script}}"
