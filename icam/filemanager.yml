@@ -73,6 +73,10 @@
     shell: "cd {{target_dir}}; curl -o {{imagefile}} {{src_image}}"
     when: (src_type|lower) == "curl"
 
+  - name: Running "yum install wget" 
+    shell: "yum install wget"
+    when: (src_type|lower) == "wget"
+    
   - name: Running the script "{{ dest_image }}/{{imagefile}}" "{{args_script}}"
     shell: "cd {{target_dir}}; wget -O {{imagefile}} {{src_image}}"
     when: (src_type|lower) == "wget"
@@ -102,4 +106,6 @@
   - name: Running the script "{{ dest_image }}/{{imagefile}}" "{{args_script}}"
     shell: "{{ dest_image }}/{{imagefile}} {{args_script}}"
     when: run is defined and (run|lower) == "true"
+    
+ 
 
