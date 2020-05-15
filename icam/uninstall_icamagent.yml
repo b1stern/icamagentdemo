@@ -1,0 +1,39 @@
+---
+- name: Uninstall icam agents 
+  hosts: all
+  vars_files:
+    - vars/commonvars.yml
+    - vars/icamvars.yml
+ 
+  tasks:
+ 
+# tasks file for uninstall-all
+
+  - name:  Test if "{{ install_dir }}" directory exists
+    stat:
+      path:  "{{ install_dir }}"
+    register: itmdir
+
+#  - name: ending the play if icam dir does not exist
+#    fail: msg="There is nothing to uninstall."
+#    when:
+#      - itmdir.stat.exists == false
+
+  - name: "Uninstall all agents from {{install_dir}}"
+    shell: "echo y | {{install_dir}}/bin/smai-agent.sh uninstall_all"
+    when: itmdir.stat.exists == true and ((agent_type | lower) == "all" or (agent_type | lower) == "smai")
+
+  - name: "Uninstall {{agent_type}} agents from {{install_dir}}"
+    shell: "echo y | {{install_dir}}/bin/{{item}}-agent.sh uninstall"
+    loop: "{{agent_type.split(',')}}"
+    when: itmdir.stat.exists == true and (agent_type | lower) != "all" and (agent_type | lower) != "smai"
+
+  - name: "Delete the dir: {{install_dir}}"
+    file:
+      path: "{{install_dir}}"
+      state: absent
+      force: yes
+    ignore_errors: yes
+    when: itmdir.stat.exists == true and remove_dir is defined and (remove_dir | lower) == "true"
+
+

@@ -1,0 +1,105 @@
+---
+- name: Copy and untar configured agent image
+  hosts: all
+  vars_files:
+    - vars/commonvars.yml
+    - vars/icamvars.yml
+ 
+  tasks:
+
+  - name: Set variable 
+    set_fact:
+      dest_image: "{{target_dir}}"
+ 
+  - name: Set variable type 
+    set_fact:
+      src_type: local 
+    when: src_type is not defined
+
+  - name: delete the directory "{{dest_image}}"
+    file:
+      path: "{{dest_image}}"
+      state: absent
+    when: del_dir is defined and (del_dir|lower) == "true" and (src_type|lower) != "local"
+
+  - name: Make remote dir "{{ dest_image }}"
+    file:
+      path: "{{ dest_image }}"
+      state: directory
+      mode: 0777
+      recurse: yes
+    ignore_errors: yes
+
+# ------------------- Copy file to end point system ----------------------------------
+
+  - set_fact:
+      imagefile: "{{ src_image | basename }}"
+    when: imagefile is not defined
+
+  - set_fact:
+      ans_file: false 
+
+  - set_fact:
+      ans_file: false
+    when: project_image is defined 
+
+  - name: "Copy the file {{imagefile}} from {{ src_image }} to end point {{ dest_image }}"
+    copy:
+      src: "{{ src_image }}"
+      dest: "{{ dest_image }}/{{imagefile}}"
+      mode: 0777
+      force: yes
+      remote_src: "{{ans_file}}"
+    when:
+      (src_type|lower) == "copy"
+
+# Downloading it from external URL
+  - name: Download the file and copy it
+    get_url:
+      url: "{{ src_image}}"
+      dest: "{{ dest_image }}"
+      mode: 0777
+      force: yes
+    when:
+      (src_type|lower) == "download"
+
+# Just setting the dest_image as we are using a local copy
+  - set_fact:
+      dest_image: "{{ src_image | dirname }}"
+    when:
+      (src_type|lower) == "local"
+
+  - name: Running the script "{{ dest_image }}/{{imagefile}}" "{{args_script}}"
+    shell: "cd {{target_dir}}; curl -o {{imagefile}} {{src_image}}"
+    when: (src_type|lower) == "curl"
+
+  - name: Running the script "{{ dest_image }}/{{imagefile}}" "{{args_script}}"
+    shell: "cd {{target_dir}}; wget -O {{imagefile}} {{src_image}}"
+    when: (src_type|lower) == "wget"
+
+
+  - set_fact:
+      install_input_file_dest: "{{dest_image}}/{{imagefile}}"
+      config_input_file_dest: "{{dest_image}}/{{imagefile}}"
+
+
+# ----------- Extract the file ------------------------------------------
+
+  - name: "Extract directory: {{untar}}"
+    unarchive:
+      src: "{{dest_image}}/{{imagefile}}"
+      dest: "{{target_dir}}/"
+      remote_src: yes
+    when: untar is defined and (untar|lower) == "true"
+
+# ----------------- Run the script ----------------------------------------
+# tasks to run remote script
+  - set_fact: 
+      args_script: " "
+    when:
+      - args_script is not defined
+
+  - name: Running the script "{{ dest_image }}/{{imagefile}}" "{{args_script}}"
+    shell: "{{ dest_image }}/{{imagefile}} {{args_script}}"
+    when: run is defined and (run|lower) == "true"
+
