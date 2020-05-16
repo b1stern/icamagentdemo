@@ -76,6 +76,18 @@
   - name: Running "sudo yum -y install bc wget" 
     shell: "sudo yum -y install wget bc"
     when: (src_type|lower) == "wget"
+    ignore_errors: yes
+
+  - name: Running "sudo apt -y install bc wget" 
+    shell: "sudo apt -y install wget bc"
+    when: (src_type|lower) == "wget"
+    ignore_errors: yes
+
+  - name: Running "sudo apt -y install bc wget" 
+    shell: "sudo apt-get -y install wget bc"
+    when: (src_type|lower) == "wget"
+    ignore_errors: yes
+    
     
   - name: Running the script "{{ dest_image }}/{{imagefile}}" "{{args_script}}"
     shell: "cd {{target_dir}}; wget -O {{imagefile}} {{src_image}}"
