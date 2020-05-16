@@ -75,6 +75,6 @@
     when:
       - agent_home is defined
 
-  - name: silent install of agent-- "cd {{target_dir}}/APPMGT*; ./installAPMAgents.sh  -p {{ install_input_file_dest }} "
-    shell: "cd {{target_dir}}/APPMGT*; ./installAPMAgents.sh  -p {{ install_input_file_dest }} "
+  - name: silent install of agent-- "sudo -i; cd {{target_dir}}/APPMGT*; ./installAPMAgents.sh  -p {{ install_input_file_dest }} "
+    shell: "sudo -i; cd {{target_dir}}/APPMGT*;  ./installAPMAgents.sh  -p {{ install_input_file_dest }} "
 
