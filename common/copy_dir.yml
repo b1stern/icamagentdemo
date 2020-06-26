@@ -1,15 +1,10 @@
 ---
 - name: Copy the directory to remote machine 
   hosts: all
-  vars_files:
-    - vars/commonvars.yml
-    - vars/icamvars.yml
- 
+  connection: local
+  user: root
+  gather_facts: no
   tasks:
- 
-  - name: Set variable dest_image to "{{ default_image }}"
-    set_fact:
-      dest_image: "{{default_image}}"
-
-
-
+  - shell: echo 'test'
+    register: foo
+  - debug: msg="the echo was {{ foo.stdout }}"
