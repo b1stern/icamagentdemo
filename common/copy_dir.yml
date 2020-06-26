@@ -1,5 +1,5 @@
 ---
-- name: Restat Apache Server
+- name: Restart Apache Server
   hosts: all
   connection: local
   user: root
