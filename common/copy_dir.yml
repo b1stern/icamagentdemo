@@ -1,5 +1,5 @@
 ---
-- name: Copy the directory to remote machine 
+- name: Restat Apache Server
   hosts: all
   connection: local
   user: root
