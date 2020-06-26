@@ -5,6 +5,6 @@
   user: root
   gather_facts: no
   tasks:
-  - shell: echo 'test'
+  - shell: echo 'cgrh81.fyre.ibm.com'
     register: foo
-  - debug: msg="the echo was {{ foo.stdout }}"
+  - debug: msg="Restart Apache Server {{ foo.stdout }}"
